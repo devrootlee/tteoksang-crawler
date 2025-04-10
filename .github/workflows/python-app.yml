@@ -3,7 +3,7 @@ name: tteoksang-crawler Deploy
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-push:
