@@ -25,3 +25,8 @@ fdr.StockListing('NASDAQ') 는 NASDAQ 에서 거래되고 있는 모든 종목�
 0      AAPL        Apple Inc         57106020          전화 및 소형 장치
 1      MSFT       Microsoft Corp     57201020           소프트웨어
 ```
+
+- 기능
+  - 수동 동기화(Fast API)
+    - 한국 주식 수동 동기화: [POST]/api/stocks/update-stock-kr
+    - 미국 주식 수동 동기화: [POST]/api/stocks/update-stock-us

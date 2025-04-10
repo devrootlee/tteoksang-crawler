@@ -1,5 +1,5 @@
-from fastapi import FastAPI
 from controller.controller import router  # 라우터 임포트
+from fastapi import FastAPI
 
 app = FastAPI(
     title="Stock Data API",
@@ -8,4 +8,4 @@ app = FastAPI(
 )
 
 # 라우터 등록
-app.include_router(router, prefix="/api/stocks")
+app.include_router(router, prefix="")

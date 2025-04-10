@@ -9,7 +9,7 @@ from db.db_connection import db_connection
 class stockInfoService:
     def update_stock_kr(self):
         # script 명
-        script_name = os.path.basename(__file__)
+        script_name = os.path.basename(__file__) + '/update_stock_kr'
         # 오늘
         run_date = date.today()
 
@@ -43,7 +43,7 @@ class stockInfoService:
             (
                 row['Code'],
                 "한국",  # 'Nation' 컬럼이 없으면 아래 참고
-                row['Market'],
+                "KOSDAQ" if row['Market'] == "KOSDAQ GLOBAL" else row['Market'],
                 row['Name'],
                 datetime.now()
             )
@@ -63,16 +63,18 @@ class stockInfoService:
         execute_values(cur, insert_stock_kr_query, stock_list)
         conn.commit()
 
+        status = 'success' if cur.rowcount > 0 else 'fail'
+
         # 종료
         end = datetime.now()
         # 소요 시간
         duration = (end - start).total_seconds()
 
         insert_stock_ingest_log_query = """
-            insert into data_ingest_duration_log (run_date, script_name, start_time, end_time, duration)
-            values (%s, %s, %s, %s, %s)
+            insert into data_ingest_log (run_date, script_name, start_time, end_time, duration, status)
+            values (%s, %s, %s, %s, %s, %s)
         """
-        cur.execute(insert_stock_ingest_log_query, (run_date, script_name, start, end, duration))
+        cur.execute(insert_stock_ingest_log_query, (run_date, script_name, start, end, duration,status))
 
         # 종료
         conn.commit()
@@ -81,7 +83,7 @@ class stockInfoService:
 
     def update_stock_us(self):
         #script명
-        script_name = os.path.basename(__file__)
+        script_name = os.path.basename(__file__) + '/update_stock_us'
 
         # 오늘
         run_date = date.today()
@@ -90,16 +92,11 @@ class stockInfoService:
         start = datetime.now()
 
         # DB 연결
-        conn = psycopg2.connect(
-            host="localhost",
-            port=5432,
-            dbname="tteoksang",
-            user="leeroot",
-            password=""
-        )
-        # 주식 정보 가져오기
+        conn = db_connection()
         us_market = ["NASDAQ", "NYSE", "AMEX"]
 
+        # 주식 정보 가져오기
+        total_row_count = 0  # 누적 처리 건수
         for market in us_market:
             cur = conn.cursor()
 
@@ -133,6 +130,7 @@ class stockInfoService:
                     datetime.now()
                 )
                 for _, row in fdr_stock_us.iterrows()
+                if '.' not in row['Symbol']
             ]
 
             insert_stock_us_query = """
@@ -146,7 +144,10 @@ class stockInfoService:
             """
 
             execute_values(cur, insert_stock_us_query, stock_list)
+            total_row_count += cur.rowcount  # 누적
             conn.commit()
+
+        status = 'success' if total_row_count > 0 else 'fail'
 
         # 종료
         end = datetime.now()
@@ -154,10 +155,10 @@ class stockInfoService:
         duration = (end - start).total_seconds()
 
         insert_stock_ingest_log_query = """
-            insert into data_ingest_duration_log (run_date, script_name, start_time, end_time, duration)
-            values (%s, %s, %s, %s, %s)
+            insert into data_ingest_log (run_date, script_name, start_time, end_time, duration, status)
+            values (%s, %s, %s, %s, %s, %s)
         """
-        cur.execute(insert_stock_ingest_log_query, (run_date, script_name, start, end, duration))
+        cur.execute(insert_stock_ingest_log_query, (run_date, script_name, start, end, duration, status))
 
         # 종료
         conn.commit()
