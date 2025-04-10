@@ -1,10 +1,12 @@
+import os
+
 import psycopg2
 
 def db_connection():
     return psycopg2.connect(
-        host="localhost",
+        host=os.environ.get("DB_HOST"),
         port=5432,
-        dbname="tteoksang",
-        user="leeroot",
-        password=""  # 환경 변수로 대체 권장
+        dbname=os.environ.get("DB"),
+        user=os.environ.get("DB_USERNAME"),
+        password=os.environ.get("DB_PASSWORD")
     )
