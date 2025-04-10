@@ -36,23 +36,23 @@ jobs:
         run: docker save tteoksang-crawler > tteoksang-crawler.tar
 
       # ✅ .env 파일 생성
-      - name: Create .env file
+      - name: Create .env-crawler file
         run: |
-          touch .env
-          chmod 644 .env
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
-          echo "DB=${{ secrets.DB }}" >> .env
-          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          touch .env-crawler
+          chmod 644 .env-crawler
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env-crawler
+          echo "DB=${{ secrets.DB }}" >> .env-crawler
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env-crawler
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env-crawler
 
       # ✅ tar 파일을 서버에 전송
-      - name: Copy .env, image to Server
+      - name: Copy .env-crawler, image to Server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER_NAME }}
           key: ${{ secrets.SERVER_KEY }}
-          source: "tteoksang-crawler.tar,.env"
+          source: "tteoksang-crawler.tar,.env-crawler"
           target: "~/app"
 
       # ✅ 이미지 로드 + Compose 로 SpringBoot 만 재시작
