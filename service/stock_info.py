@@ -114,10 +114,9 @@ class stockInfoService:
             delete_stocks_id = db_stocks_id - fdr_stocks_id
 
             if delete_stocks_id:
-                execute_values(
-                    cur,
-                    "delete from stock where stock_id in %s",
-                    [(tuple(delete_stocks_id))]
+                cur.execute(
+                    "DELETE FROM stock WHERE stock_id = ANY(%s) AND nation_type = %s AND market = %s",
+                    (list(delete_stocks_id), "미국", market)
                 )
 
             # 주식 정보 저장
