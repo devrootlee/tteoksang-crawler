@@ -1,12 +1,12 @@
 import os
 import FinanceDataReader as fdr
-import psycopg2
 from psycopg2.extras import execute_values
 from datetime import datetime, date
 
 from db.db_connection import db_connection
 
 class stockInfoService:
+    # 한국 주식 동가화
     def update_stock_kr(self):
         # script 명
         script_name = os.path.basename(__file__) + '/update_stock_kr'
@@ -21,7 +21,7 @@ class stockInfoService:
         cur = conn.cursor()
 
         # DB 데이터 확인
-        cur.execute("select id from stock where 1=1 and nation_type = '한국';")
+        cur.execute("select stock_id from stock where 1=1 and nation_type = '한국';")
         db_stocks_id = set(row[0] for row in cur.fetchall())
 
         # 주식 정보 가져오기
@@ -34,7 +34,7 @@ class stockInfoService:
         if delete_stocks_id:
             execute_values(
                 cur,
-                "delete from stock where id in %s;",
+                "delete from stock where stock_id in %s;",
                 [(tuple(delete_stocks_id),)]
             )
 
@@ -51,9 +51,9 @@ class stockInfoService:
         ]
 
         insert_stock_kr_query = """
-            insert into stock (id, nation_type, market, stock_name, created_at)
+            insert into stock (stock_id, nation_type, market, stock_name, created_at)
             values %s
-            on conflict (id) do update set
+            on conflict (stock_id) do update set
             nation_type = EXCLUDED.nation_type,
             market = EXCLUDED.market,
             stock_name = EXCLUDED.stock_name,
@@ -81,6 +81,7 @@ class stockInfoService:
         cur.close()
         conn.close()
 
+    # 미국 주식 동가화
     def update_stock_us(self):
         #script명
         script_name = os.path.basename(__file__) + '/update_stock_us'
@@ -102,7 +103,7 @@ class stockInfoService:
 
             # DB 데이터 확인
             cur.execute(
-                "SELECT id FROM stock WHERE nation_type = %s AND market = %s;",
+                "SELECT stock_id FROM stock WHERE nation_type = %s AND market = %s;",
                 ("미국", market)
             )
             db_stocks_id = set(row[0] for row in cur.fetchall())
@@ -115,7 +116,7 @@ class stockInfoService:
 
             if delete_stocks_id:
                 cur.execute(
-                    "DELETE FROM stock WHERE id = ANY(%s) AND nation_type = %s AND market = %s",
+                    "DELETE FROM stock WHERE stock_id = ANY(%s) AND nation_type = %s AND market = %s",
                     (list(delete_stocks_id), "미국", market)
                 )
 
@@ -133,9 +134,9 @@ class stockInfoService:
             ]
 
             insert_stock_us_query = """
-                insert into stock (id, nation_type, market, stock_name, created_at)
+                insert into stock (stock_id, nation_type, market, stock_name, created_at)
                 values %s
-                on conflict (id) do update set
+                on conflict (stock_id) do update set
                 nation_type = EXCLUDED.nation_type,
                 market = EXCLUDED.market,
                 stock_name = EXCLUDED.stock_name,
