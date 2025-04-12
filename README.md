@@ -30,3 +30,6 @@ fdr.StockListing('NASDAQ') 는 NASDAQ 에서 거래되고 있는 모든 종목�
   - 수동 동기화(Fast API)
     - 한국 주식 수동 동기화: [POST]/api/stocks/update-stock-kr
     - 미국 주식 수동 동기화: [POST]/api/stocks/update-stock-us
+
+- secrets 설정
+![img.png](img.png)
