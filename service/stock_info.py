@@ -21,7 +21,7 @@ class stockInfoService:
         cur = conn.cursor()
 
         # DB 데이터 확인
-        cur.execute("select stock_id from stock where 1=1 and nation_type = '한국';")
+        cur.execute("SELECT stock_id FROM stock WHERE 1=1 and nation_type = '한국';")
         db_stocks_id = set(row[0] for row in cur.fetchall())
 
         # 주식 정보 가져오기
@@ -51,9 +51,9 @@ class stockInfoService:
         ]
 
         insert_stock_kr_query = """
-            insert into stock (stock_id, nation_type, market, stock_name, created_at)
-            values %s
-            on conflict (stock_id) do update set
+            INSERT INTO stock (stock_id, nation_type, market, stock_name, created_at)
+            VALUES %s
+            ON CONFLICT (stock_id) DO UPDATE SET
             nation_type = EXCLUDED.nation_type,
             market = EXCLUDED.market,
             stock_name = EXCLUDED.stock_name,
@@ -71,8 +71,8 @@ class stockInfoService:
         duration = (end - start).total_seconds()
 
         insert_stock_ingest_log_query = """
-            insert into data_ingest_log (run_date, script_name, start_time, end_time, duration, status)
-            values (%s, %s, %s, %s, %s, %s)
+            INSERT INTO data_ingest_log (run_date, script_name, start_time, end_time, duration, status)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
         cur.execute(insert_stock_ingest_log_query, (run_date, script_name, start, end, duration,status))
 
@@ -84,6 +84,7 @@ class stockInfoService:
     # 미국 주식 동가화
     def update_stock_us(self):
         #script명
+        global cur
         script_name = os.path.basename(__file__) + '/update_stock_us'
 
         # 오늘
@@ -115,9 +116,10 @@ class stockInfoService:
             delete_stocks_id = db_stocks_id - fdr_stocks_id
 
             if delete_stocks_id:
-                cur.execute(
-                    "DELETE FROM stock WHERE stock_id = ANY(%s) AND nation_type = %s AND market = %s",
-                    (list(delete_stocks_id), "미국", market)
+                execute_values(
+                    cur,
+                    "DELETE FROM stock WHERE stock_id in %s;",
+                    [(tuple(delete_stocks_id),)]
                 )
 
             # 주식 정보 저장
@@ -134,9 +136,9 @@ class stockInfoService:
             ]
 
             insert_stock_us_query = """
-                insert into stock (stock_id, nation_type, market, stock_name, created_at)
-                values %s
-                on conflict (stock_id) do update set
+                INSERT INTO stock (stock_id, nation_type, market, stock_name, created_at)
+                VALUES %s
+                ON CONFLICT (stock_id) DO UPDATE SET
                 nation_type = EXCLUDED.nation_type,
                 market = EXCLUDED.market,
                 stock_name = EXCLUDED.stock_name,
@@ -155,13 +157,13 @@ class stockInfoService:
         duration = (end - start).total_seconds()
 
         insert_stock_ingest_log_query = """
-            insert into data_ingest_log (run_date, script_name, start_time, end_time, duration, status)
-            values (%s, %s, %s, %s, %s, %s)
+            INSERT INTO data_ingest_log (run_date, script_name, start_time, end_time, duration, status)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
         cur.execute(insert_stock_ingest_log_query, (run_date, script_name, start, end, duration, status))
+        conn.commit()
 
         # 종료
-        conn.commit()
         cur.close()
         conn.close()
 
