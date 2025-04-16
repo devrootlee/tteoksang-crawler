@@ -36,7 +36,7 @@ jobs:
         run: docker save tteoksang-crawler > tteoksang-crawler.tar
 
       # ✅ tar 파일을 서버에 전송
-      - name: Copy .env-crawler, image to Server
+      - name: Copy image to Server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -45,8 +45,8 @@ jobs:
           source: "tteoksang-crawler.tar"
           target: "~/app"
 
-      # ✅ 이미지 로드 + Compose 로 SpringBoot 만 재시작
-      - name: Reload SpringBoot container via docker-compose
+      # ✅ 이미지 로드 + Compose 로 Python 만 재시작
+      - name: Reload Python container via docker-compose
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_HOST }}
