@@ -1,21 +1,13 @@
 from fastapi import APIRouter
-from service.stock_info import stockInfoService
+from service.krx_stock_info import KRXStockService
 
 router = APIRouter()
-stock_service = stockInfoService()
+krx_stock_service = KRXStockService()
 
 @router.post("/update-stock-kr")
 def update_stock_kr():
     try:
-        result = stock_service.update_stock_kr()
-        return result
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
-@router.post("/update-stock-us")
-def update_stock_us():
-    try:
-        result = stock_service.update_stock_us()
-        return result
+        krx_stock_service.fetch_and_process()
+        return {"status": "success", "message": "KRX 주식 정보가 성공적으로 업데이트되었습니다."}
     except Exception as e:
         return {"status": "error", "message": str(e)}
