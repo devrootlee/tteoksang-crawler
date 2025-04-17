@@ -3,7 +3,7 @@ from fastapi import FastAPI
 
 app = FastAPI(
     title="Stock Data API",
-    description="한국/미국 주식 데이터를 업데이트하는 API",
+    description="주식 데이터 수집 API",
     version="1.0.0"
 )
 
