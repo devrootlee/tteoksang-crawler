@@ -2,7 +2,7 @@ import os
 
 import psycopg2
 
-def db_local_connection():
+def db_connection():
     return psycopg2.connect(
         host=os.environ.get("DB_HOST"),
         port=5432,

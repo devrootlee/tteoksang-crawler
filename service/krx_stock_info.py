@@ -3,7 +3,7 @@ import FinanceDataReader as fdr
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from psycopg2.extras import execute_values
-from db.db_connection import db_local_connection
+from db.db_connection import db_connection
 
 class KRXStockService:
     def __init__(self):
@@ -109,7 +109,7 @@ class KRXStockService:
     # krx stock 저장 함수
     def save_krx_stock(self, krx_stock_info, krx_stock_trade_info):
         try:
-            with db_local_connection() as conn:
+            with db_connection() as conn:
                 with conn.cursor() as cur:
                     values1 = [
                         (
@@ -176,7 +176,7 @@ class KRXStockService:
     # 데이터 수집 로그 저장 함수
     def save_log(self, script_name, start_time, end_time, duration, status):
         try:
-            with db_local_connection() as conn:
+            with db_connection() as conn:
                 with conn.cursor() as cur:
                     sql = """
                         INSERT INTO data_ingest_log (
