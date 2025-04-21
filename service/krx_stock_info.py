@@ -120,7 +120,7 @@ class KRXStockService:
                         ) for item in krx_stock_info
                     ]
                     sql1 = """
-                        INSERT INTO krx_stock_info (stock_id, market, stock_name, created_at)
+                        INSERT INTO kr_stock_info (stock_id, market, stock_name, created_at)
                         VALUES %s
                         ON CONFLICT (stock_id) DO UPDATE SET
                         market = EXCLUDED.market,
@@ -146,7 +146,7 @@ class KRXStockService:
                         ) for item in krx_stock_trade_info
                     ]
                     sql2 = """
-                        INSERT INTO krx_stock_trade_info (
+                        INSERT INTO kr_stock_trade_info (
                             stock_id, trade_date, close_price, change_rate,
                             open_price, high_price, low_price,
                             high_52_week_price, low_52_week_price,
